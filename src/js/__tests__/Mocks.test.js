@@ -1,12 +1,14 @@
 import GameSavingLoader from '../GameSavingLoader';
+import json from '../parser';
 import read from '../reader';
 
 jest.mock('../reader');
+jest.mock('../parser');
 
 afterEach(() => jest.resetAllMocks());
 
 test('Метод load должен создавать объект типа GameSaving', async () => {
-  read.mockReturnValue('{"id":9,"created":1546300800,"userInfo":{"id":1,"name":"Hitman","level":10,"points":2000}}');
+  json.mockResolvedValue('{"id":9,"created":1546300800,"userInfo":{"id":1,"name":"Hitman","level":10,"points":2000}}');
   const received = await GameSavingLoader.load();
   const expected = {
     id: 9,
@@ -22,10 +24,10 @@ test('Метод load должен создавать объект типа Game
 });
 
 test('Метод load должен выбрасывать ошибку', async () => {
-  read.mockReturnValue(new Error('Ошибка!'));
+  read.mockRejectedValue(new Error('Ошибка!'));
   try {
     await GameSavingLoader.load();
   } catch (error) {
-    expect(error).toEqual('Ошибка!');
+    expect(error.message).toEqual('Ошибка!');
   }
 });
